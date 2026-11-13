@@ -1,5 +1,6 @@
 from api.controllers import Delivery
 from django_mock_queries.query import MockSet, MockModel
+import pytest
 
 def test_LotsOfItems():
   #Arrange
@@ -37,4 +38,15 @@ def test_LittleItems():
   cost = Delivery.calculate(order, del_dist)
   #Assert
   # TODO: replace the pass with an assert to test the value returned.
-  assert cost == 2.50
+  assert cost == 3.50
+
+@pytest.mark.parametrize('quantity,distance', [
+  (0, 0),
+  (5, 6),
+  (6, 3),
+  (11, 3),
+])
+def test_DefaultFeeAtTierBoundaries(quantity, distance):
+  order = MockSet(MockModel(quantity=quantity))
+
+  assert Delivery.calculate(order, distance) == 3.50
